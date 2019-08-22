@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" dubug="false" scanPeriod="60 seconds">
+    <!--  <include resource="org/springframework/boot/logging/logback/base.xml"/> -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <contextName>trh-bill</contextName>
+    <!--<springProperty scope="context" name="elk_master_ip" source="elk_master_ip" defaultValue=""/>-->
+    <!--<springProperty scope="context" name="elk_master_port" source="elk_master_port" defaultValue=""/>-->
+    <property name="LOG_PATH" value="logs"></property>
+
+    <property name="DIR_PATH" value="exampel"></property>
+
+
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder charset="UTF-8">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger Line:%-3L - %msg%n</pattern>
+            <immediateFlush>false</immediateFlush>
+        </encoder>
+    </appender>
+
+
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${DIR_PATH}/log_error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${DIR_PATH}/log-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>20</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>500MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger Line:%-3L - %msg%n</pattern>
+            <charset>utf-8</charset>
+            <immediateFlush>false</immediateFlush>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>error</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="FILE_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${DIR_PATH}/log_warn.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${DIR_PATH}/log-warn-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>20</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>500MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger Line:%-3L - %msg%n</pattern>
+            <charset>utf-8</charset>
+            <immediateFlush>false</immediateFlush>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>warn</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${DIR_PATH}/log_info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${DIR_PATH}/log-info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>20</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>500MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger Line:%-3L - %msg%n</pattern>
+            <charset>utf-8</charset>
+            <immediateFlush>true</immediateFlush>
+        </encoder>
+        <!--<filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>info</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>-->
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>message.contains("duration")</expression>
+            </evaluator>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="FILE_INFO_interceptor" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${DIR_PATH}/log_info_interceptor.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${DIR_PATH}/log_info_interceptor-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>20</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>500MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n</pattern>
+            <charset>utf-8</charset>
+            <immediateFlush>true</immediateFlush>
+        </encoder>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>message.contains("duration")</expression>
+            </evaluator>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!--  logstash服务收集日志  -->
+    <!--<appender name="LOGSTASH-ERROR"
+              class="net.logstash.logback.appender.LogstashSocketAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>error</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <host>${elk_master_ip}</host>
+        <port>${elk_master_port}</port>
+        <customFields>{"logname":"sys","servername":"trh-bill"}</customFields>
+    </appender>-->
+    <!--<springProfile name="test,dev">
+        <logger name="org.springframework.jdbc.core" level="trace" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE_INFO"/>
+        </logger>
+    </springProfile>-->
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE_ERROR" />
+        <appender-ref ref="FILE_WARN" />
+        <appender-ref ref="FILE_INFO" />
+        <appender-ref ref="FILE_INFO_interceptor" />
+        <!--<appender-ref ref="LOGSTASH-ERROR" />-->
+    </root>
+
+</configuration>

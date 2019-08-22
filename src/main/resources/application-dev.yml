@@ -1,0 +1,62 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:1111/eureka/
+feign:
+  hystrix:
+    enabled: true
+server:
+  port: 8090
+  tomcat:
+    acceptCount: 3000
+    maxConnections: 3000
+    maxThreads: 3000
+    minSpareThreads: 500
+    uri-encoding: UTF-8
+spring:
+  application:
+    name: EXAMPLE
+  datasource:
+    name: db
+    cachePrepStmts: true
+    connectionInitSqls: set names utf8mb4
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    initialSize: 10
+    maxActive: 100
+    maxPoolPreparedStatementPerConnectionSize: 50
+    maxWait: 60000
+    minEvictableIdleTimeMillis: 300000
+    minIdle: 5
+    poolPreparedStatements: true
+    removeAbandoned: true
+    testOnBorrow: false
+    testOnReturn: false
+    testWhileIdle: rue
+    timeBetweenEvictionRunsMillis: 60000
+    validationQuery: select 'x'
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/trh_bill?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: zfzf123
+  rabbitmq:
+    host: 192.168.1.154
+    password: guest
+    port: 5672
+    username: guest
+  redis:
+    database: 0
+    host: 192.168.1.154
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1ms
+        min-idle: 0
+    password: jingxiaohuredis@123
+    port: 6379
+    timeout: 2000ms
+#--------------------------服务追踪sleuth配置----------------------------------
+#--------------------------断路器hystrix配置-----------------------------------
+#--------------------------网关zuul组件配置------------------------------------
+#--------------------------缓存redis配置---------------------------------------

@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>汇付</title>
+    <style>
+        *, html {
+            padding: 0;
+            margin: 0;
+        }
+
+        #huifu {
+            width: 100%;
+            height: auto;
+        }
+
+        .hf_success, .hu_fail,.hu_load {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 48px;
+        }
+
+        .hf_s_icon, .hf_f_icon {
+            width: 92px;
+            height: 92px;
+        }
+
+        .hf_s_icon img, .hf_f_icon img {
+            padding-bottom: 15px;
+            width: 100%;
+        }
+
+        .tip {
+            margin: 28px 0 48px;
+            font-size: 20px;
+            font-family: PingFangSC-Regular;
+            font-weight: 400;
+            color: rgba(153, 153, 153, 1);
+            line-height: 28px;
+        }
+
+        button {
+            width: 339px;
+            height: 42px;
+            font-size: 15px;
+            font-family: PingFangSC-Regular;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 1);
+            line-height: 16px;
+            background-color: #ff0000;
+            border: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+<div id="huifu">
+    <div class="hf_success" style="display: none">
+        <div class="hf_s_icon">
+            <img src="http://pjd-static.trh-cd.com/bill/png/success.png" alt="成功"/>
+        </div>
+        <span class="tip successTip">成功</span>
+        <button onclick="toApp('pk')">确定</button>
+    </div>
+    <div class="hu_fail" style="display: none">
+        <div class="hf_f_icon">
+            <img src="http://pjd-static.trh-cd.com/bill/png/fail.png" alt="失败"/>
+        </div>
+        <span class="tip failTip">失败</span>
+        <button onclick="toApp('fail')">确定</button>
+    </div>
+    <div class="hu_load" style="display: none">
+        <div class="hf_f_icon">
+            <img src="http://pjd-static.trh-cd.com/bill/png/change-middle.png" alt="处理中"/>
+        </div>
+        <span class="tip loadTip">处理中</span>
+        <button onclick="toApp('load')">确定</button>
+    </div>
+
+    <input id="CmdId" type="hidden" th:value="${CmdId}"/>
+    <input id="RespCode" type="hidden" th:value="${RespCode}"/>
+    <input id="RespDesc" type="hidden" th:value="${RespDesc}"/>
+</div>
+
+<script>
+    function toApp() {
+        console.log('确定');
+        try{
+            Android_Method.close();
+        }catch (e) {
+            console.log("执行Android_Method.close()方法错误");
+        }
+        try{
+            window.webkit.messageHandlers.trh_complete.postMessage({body: 'goodsId=1212'});
+        }catch (e) {
+            console.log("执行window.webkit.messageHandlers.trh_complete.postMessage({body: 'goodsId=1212'})方法错误");
+        }
+        // console.log(document.querySelector(".hu_fail").style.display = 'flex')
+    }
+
+    window.onload = function () {
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+        });
+        window.history.pushState('forward', null, '#'); //在IE中必须得有这两行
+        window.history.forward(1);
+        try{
+            Android_Method.complete();
+        }catch (e) {
+            console.log("执行Android_Method.complete()方法错误");
+        }
+
+        var CmdId = document.getElementById("CmdId").value;// 消息类型
+        var RespCode = document.getElementById("RespCode").value; // 响应吗
+        var RespDesc = document.getElementById("RespDesc").value; // 响应描述
+        var notice = document.querySelector(".successTip");
+        var failNotice = document.querySelector(".failTip");
+        var loadNotice = document.querySelector(".loadTip");
+        console.log(RespCode);
+        console.log(RespDesc);
+        console.info(CmdId);
+
+        if (RespCode === '000') {
+            if (CmdId === 'UserRegister') {
+                document.querySelector(".hf_success").style.display = 'flex';
+                notice.innerHTML = "开户成功！";
+            } else if (CmdId === "NetSave") {
+                document.querySelector(".hf_success").style.display = 'flex';
+                notice.innerHTML = "充值成功！";
+            } else if (CmdId === "Cash") {
+                document.querySelector(".hf_success").style.display = 'flex';
+                notice.innerHTML = "提现成功！";
+            } else if (CmdId === "InitiativeTender") {
+                document.querySelector(".hf_success").style.display = 'flex';
+                notice.innerHTML = "出借成功！";
+            }
+        } else {
+            if (CmdId === 'UserRegister') {
+                document.querySelector(".hu_fail").style.display = 'flex';
+                failNotice.innerHTML = "开户失败！";
+            } else if (CmdId === "NetSave") {
+                if(RespCode === '443'){
+                    document.querySelector(".hu_load").style.display = 'flex';
+                    loadNotice.innerHTML = "充值处理中";
+                }else{
+                    document.querySelector(".hu_fail").style.display = 'flex';
+                    failNotice.innerHTML = "充值失败！";
+                }
+            } else if (CmdId === "Cash") {
+                document.querySelector(".hu_fail").style.display = 'flex';
+                failNotice.innerHTML = "提现失败！";
+            } else if (CmdId === "InitiativeTender") {
+                document.querySelector(".hu_fail").style.display = 'flex';
+                failNotice.innerHTML = "出借失败！";
+            }
+        }
+
+        try {
+            if(navigator.userAgent.indexOf('MicroMessenger') > -1){
+                document.querySelectorAll("button")[0].style.display = "none";
+                document.querySelectorAll("button")[1].style.display = "none";
+                document.querySelectorAll("button")[2].style.display = "none";
+            }
+        }catch (e) {
+
+        }
+
+
+    };
+</script>
+</body>
+</html>
