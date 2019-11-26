@@ -1,10 +1,15 @@
 package com.springzhou.example.service;
 
 
+import org.apache.rocketmq.client.exception.MQBrokerException;
+import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,6 +31,8 @@ public class RocketmqProducerService {
     @Resource
     private RocketMQTemplate rocketMQTemplate;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RocketmqProducerService.class);
+
     /**
      * 同步发送字符串消息
      * @param message
@@ -45,9 +52,9 @@ public class RocketmqProducerService {
 	   }*/
         SendResult sendResult = rocketMQTemplate.syncSend(topic, message);
         // 打印发送结果信息
-        System.out.printf("string-topic syncSend1 sendResult=%s %n", sendResult);
+        LOGGER.info("string-topic syncSend1 sendResult=%s %n", sendResult);
         Long endTime = System.currentTimeMillis();
-        System.out.println("单次生产耗时："+(endTime-startTime)/1000);
+        LOGGER.info("单次生产耗时："+(endTime-startTime)/1000);
         return true;
     }
 
@@ -65,7 +72,7 @@ public class RocketmqProducerService {
         // 以同步的方式发送字符串消息给指定的topic
         SendResult sendResult = rocketMQTemplate.syncSend(topic, msg);
         // 打印发送结果信息
-        System.out.printf("string-topic syncSend1 sendResult=%s %n", sendResult);
+        LOGGER.info("string-topic syncSend1 sendResult=%s %n", sendResult);
         return true;
     }
 
@@ -80,13 +87,24 @@ public class RocketmqProducerService {
         Map<String,Object> map = new HashMap<String,Object>();
         map.put("name", "sixmonth");
         map.put("age", "88");
-        Message msg = new Message("openSporting", "tem1", map.toString().getBytes());
+        Message msg = new Message(topic, "tem1", map.toString().getBytes());
         //"1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h"
         msg.setDelayTimeLevel(level);
         // 以同步的方式发送字符串消息给指定的topic
-        SendResult sendResult = rocketMQTemplate.syncSend(topic, msg);
+        SendResult sendResult = null;
+        try {
+            sendResult = rocketMQTemplate.getProducer().send(msg);
+        } catch (MQClientException e) {
+            e.printStackTrace();
+        } catch (RemotingException e) {
+            e.printStackTrace();
+        } catch (MQBrokerException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // 打印发送结果信息
-        System.out.printf("string-topic syncSend1 sendResult=%s %n", sendResult);
+        LOGGER.info("string-topic syncSend1 sendResult=%s %n", sendResult);
         return true;
     }
 
@@ -105,12 +123,12 @@ public class RocketmqProducerService {
             @Override
             public void onSuccess(final SendResult sendResult) {
                 //消息发送成功
-                System.out.println("send message success. topic=" + sendResult.getSendStatus());
+                LOGGER.info("send message success. topic=" + sendResult.getSendStatus());
             }
             @Override
             public void onException(Throwable e) {
                 //消息发送失败
-                System.out.println("send message failed. execption=" + e.getStackTrace() );
+                LOGGER.info("send message failed. execption=" + e.getStackTrace() );
             }
         });
         return true;

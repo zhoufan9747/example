@@ -43,7 +43,7 @@ public class RoketmqController {
     @GetMapping("/sendMsgObjDelay")
     public Map sendMsgObjDelay(HttpServletRequest request, String msg) {
         Map map = new HashMap();
-        map.put("result",rocketmqProducerService.sendMsgObjDelay(5));
+        map.put("result",rocketmqProducerService.sendMsgObjDelay(3));
         return map;
     }
 
